@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Net;  
+using System.Net;
+using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace servicetwo.Controllers
 {
@@ -80,5 +82,27 @@ namespace servicetwo.Controllers
             } 
            return host;
         }
+
+        [HttpGet]
+        [Route("/api/Weather/saveDB")]
+        public object saveDB()
+        {
+
+            // /mongodb://username@myserver/?authMechanism=MONGODB-X509
+            MongoClient dbClient = new MongoClient ("mongodb://admin:password@localhost:27017");
+            var database = dbClient.GetDatabase ("User-account");
+            var collection = database.GetCollection<Book>("grades");  
+            Book b = new Book();
+            b.Author ="test author";       
+            b.Category ="test categor";
+            b.Name ="test name";
+            Random r = new Random();
+            b.Price = r.Next();
+            b.Id = b.Price.ToString();
+            collection.InsertOne(b);
+            return collection.Find(_ => true).ToList();
+            
+        }
+        //mongodb://admin:password@
     }
 }
